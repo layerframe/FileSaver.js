@@ -79,6 +79,7 @@ var saveAs = _global.saveAs || (
   // Use download attribute first if possible (#193 Lumia mobile) unless this is a macOS WebView
   : ('download' in HTMLAnchorElement.prototype && !isMacOSWebView)
   ? function saveAs (blob, name, opts) {
+    console.log('blob, name, opts', blob, name, opts)
     var URL = _global.URL || _global.webkitURL
     var a = document.createElement('a')
     name = name || blob.name || 'download'
@@ -89,6 +90,7 @@ var saveAs = _global.saveAs || (
     // TODO: detect chrome extensions & packaged apps
     // a.target = '_blank'
 
+    console.log('typeof blob === "string"', typeof blob === 'string')
     if (typeof blob === 'string') {
       // Support regular links
       a.href = blob
@@ -142,12 +144,16 @@ var saveAs = _global.saveAs || (
     var isSafari = /constructor/i.test(_global.HTMLElement) || _global.safari
     var isChromeIOS = /CriOS\/[\d]+/.test(navigator.userAgent)
 
+    console.log('isChromeIOS', isChromeIOS)
+
     if ((isChromeIOS || (force && isSafari) || isMacOSWebView) && typeof FileReader !== 'undefined') {
       // Safari doesn't allow downloading of blob URLs
       var reader = new FileReader()
       reader.onloadend = function () {
         var url = reader.result
         url = isChromeIOS ? url : url.replace(/^data:[^;]*;/, 'data:attachment/file;')
+
+        console.log('final url using FileReader', url)
         if (popup) popup.location.href = url
         else location = url
         popup = null // reverse-tabnabbing #460
